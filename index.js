@@ -104,10 +104,14 @@ const evaluate = R.curry((env, manifest) => {
       rules[rule.name] = cleanValue;
     } else {
       if(rule.hasDefault) {
-        const cleanDefault = parseType(rule.name, rule.type, rule.defaultValue);
-        rules[rule.name] = cleanDefault;
+        if(rule.defaultValue === undefined || rule.defaultValue === "undefined") {
+          rules[rule.name] = undefined;
+        } else {
+          const cleanDefault = parseType(rule.name, rule.type, rule.defaultValue);
+          rules[rule.name] = cleanDefault;
+        }
       } else {
-        throw new Error(`Envvar ${rule.type} was not set and did not have a default value`);
+        throw new Error(`Envvar ${rule.name} was not set and did not have a default value`);
       }
     }
 
