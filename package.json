@@ -2,18 +2,25 @@
   "name": "varium",
   "version": "1.0.0",
   "description": "A strict parser and validator of environment config variables",
-  "main": "index.js",
+  "engines": {
+    "node": ">=5.6"
+  },
+  "main": "src",
   "scripts": {
-    "test": "mocha test/"
+    "test": "eslint --fix . && mocha --recursive './{,!(node_modules)/**/}*.test.js'"
   },
   "keywords": [],
   "author": "Andreas Hultgren",
   "license": "ISC",
   "dependencies": {
-    "ramda": "^0.22.1"
+    "debug": "^2.6.1",
+    "ramda": "^0.23.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0",
     "mocha": "^3.0.2"
   }
 }

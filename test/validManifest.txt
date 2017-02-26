@@ -1,5 +1,1 @@
-REQUIRED_URL : String
-POSITION : Int | 7
-ENABLE_STUFF : Bool | false # Stuff should be shown if enabled
-LIST_OF_THINGS : Json | []
-EMPTY_DEFAULT : Json |
+TEST : String |
