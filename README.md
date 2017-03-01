@@ -1,55 +1,59 @@
 # Varium
 
-A strict parser and validator of environment config variables. The fundametal
+A strict parser and validator of environment config variables. The fundamental
 priniciples are that you want:
 
-1. to have _one_ place where _all_ environment variables are declared
+1. to have _one_ place where _all_ environment variables are declared and documented
 2. CI and/or builds to _fail_ if any environment variables are missing
 3. to prevent developers from ever using an undeclared env var
-4. to be able to set e.g. `SOME_FLAG=false` and have it treated like a boolean.
+4. e.g. `SOME_FLAG=false` to be treated like a boolean.
 
-This package does not handle loading of environment variables themselves. Use
-foreman or dotenv or whatever you prefer for that.
+In short you will never again have to hunt around in the source code for any
+envrionment variables you might be missing.
+
+(Note that Varium does not handle loading of environment variables from files
+(for example in develeopment environments). Use foreman/nf or dotenv, or
+whatever you prefer, for that.)
+
 
 ## Installation
 
-`npm install varium -s`
+`npm install varium -S`
 
-_Requires node v4 or above._
+_Requires node v6.5 or above._
+
 
 ## Usage
 
-The central piece of your environment configuration is the manifest. Maybe
-located at `env.manifest`:
+The central piece of your environment configuration is the manifest. I suggest
+you create a file named `env.manifest`. It looks like this:
 
 ```
 REQUIRED_URL : String
-POSITION : Int | 7
+A_NUMBER : Int | 7
 FLAG : Bool | false # Comment, can be used as documentation
 LIST_OF_THINGS : Json | []
-OPTIONAL_WITH_NO_DEFAULT : String |
+OPTIONAL_WITH_UNDEFINED_DEFAULT : String |
 ```
 
-Create a central file for your config, probably `config/index.js`, where you put
-something like this:
+Then you need a central file for your config, probably `config/index.js`, where
+you need the following:
 
 ```js
 const varium = require('varium');
-
 module.exports = varium(process.env, 'env.manifest');
 ```
 
-Then use the config in other modules like this:
+Now you can use the config in other modules. For example:
 
 ```js
 const config = require('./config');
-
-const myVar = config.get('POSITION');
-console.log(myVar); // 7
+console.log(config.get('A_NUMBER')); // 7
+console.log(config.get('WAIT_WHAT_IS_THIS')); // throws Error: Varium: Undeclared env var "WAIT_WHAT_IS_THIS"
 ```
 
-To abort builds you can for example on heroku just run the config file postbuild.
-Just add the following to your package.json.
+To abort builds, for example on heroku, you can run the config file postbuild.
+Just add the following to your package.json:
 
 ```js
 {
@@ -59,6 +63,8 @@ Just add the following to your package.json.
 }
 ```
 
+
+# Documentation
 
 ## Manifest syntax
 
@@ -93,9 +99,25 @@ the environment variable is not defined.
 
 **Returns** the value.
 
+[debug]: https://www.npmjs.com/package/debug
 
-## Known caveats
+### varium.Varium : Config -> varium
 
-* `#` is currently not supported other than for stating comments (thus can't be
-  used in default values). Will be fixed when I get around to writing a custom
-  lexer and parser.
+* **Config.customValidators** : Use your own validators for custom types, or
+  overwrite the built-in ones. For example:
+  
+  ```js
+  Varium({
+    FortyTwo : (value, def) => value === "42" ? 42 : def
+  }, process.env, "env.manifest");
+  ```
+
+Returns an instance with the same api as described for `varium` above.
+
+
+## Logs
+
+[Debug][debug] is used for logging. Thus if you need to debug something, set
+`DEBUG=varium:*`. Notice, however, that it's not adviced to use this level in
+production. It logs env var values and may thus potentially log secrets, which
+is generally frowned upon.

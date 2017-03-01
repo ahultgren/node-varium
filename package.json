@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "A strict parser and validator of environment config variables",
   "engines": {
-    "node": ">=5.6"
+    "node": ">=6.5"
   },
   "main": "src",
   "scripts": {
     "test": "eslint --fix . && mocha --recursive './{,!(node_modules)/**/}*.test.js'"
   },
-  "keywords": [],
+  "keywords": ["env", "environment", "manifest", "config", "settings", "var", "variable"],
   "author": "Andreas Hultgren",
   "license": "ISC",
   "dependencies": {
