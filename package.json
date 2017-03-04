@@ -1,7 +1,7 @@
 {
   "name": "varium",
   "version": "1.0.1",
-  "description": "A strict parser and validator of environment config variables",
+  "description": "Declare and validate environment variables",
   "engines": {
     "node": ">=6.5"
   },

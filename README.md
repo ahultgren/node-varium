@@ -1,19 +1,43 @@
 # Varium
 
-A strict parser and validator of environment config variables. The fundamental
-priniciples are that you want:
+Declare and validate environment variables.
 
-1. to have _one_ place where _all_ environment variables are declared and documented
-2. CI and/or builds to _fail_ if any environment variables are missing
-3. to prevent developers from ever using an undeclared env var
-4. e.g. `SOME_FLAG=false` to be treated like a boolean.
+Let's say you join a project and need to set up environment variables. You find
+a file called `env.manifest`. It contains the following:
+
+```
+REQUIRED_URL : String
+A_NUMBER : Int | 7
+FLAG : Bool | false # Comment, can be used as documentation
+LIST_OF_THINGS : Json | []
+OPTIONAL_WITH_UNDEFINED_DEFAULT : String |
+```
+
+You immediately see what env vars you need, and what they do.
+
+
+## TOC
+
+* [Philosophy](#philosophy)
+* [Installation](#installation)
+* [Usage](#usage)
+* [Documentation](#documentation)
+  * [Manifest syntax](#manifest-syntax)
+  * [API](#api)
+  * [Logs](#logs)
+
+
+## Philosophy
+
+The fundamental principles are that you want to:
+
+1. have _one_ place where _all_ environment variables are declared and documented
+2. _abort_ CI and/or builds if any environment variable is missing
+3. prevent developers (yourself) from ever using an undeclared env var
+4. treat e.g. `SOME_FLAG=false` as a boolean.
 
 In short you will never again have to hunt around in the source code for any
-envrionment variables you might be missing.
-
-(Note that Varium does not handle loading of environment variables from files
-(for example in develeopment environments). Use foreman/nf or dotenv, or
-whatever you prefer, for that.)
+environment variables you might be missing.
 
 
 ## Installation
@@ -26,23 +50,19 @@ _Requires node v6.5 or above._
 ## Usage
 
 The central piece of your environment configuration is the manifest. I suggest
-you create a file named `env.manifest`. It looks like this:
+you create a file named `env.manifest`, see the example above.
 
-```
-REQUIRED_URL : String
-A_NUMBER : Int | 7
-FLAG : Bool | false # Comment, can be used as documentation
-LIST_OF_THINGS : Json | []
-OPTIONAL_WITH_UNDEFINED_DEFAULT : String |
-```
-
-Then you need a central file for your config, probably `config/index.js`, where
+Next, create a central file for your config, probably `config/index.js`, where
 you need the following:
 
 ```js
 const varium = require('varium');
 module.exports = varium(process.env, 'env.manifest');
 ```
+
+Of course you also need to actually define the environment variables, either
+as actual env vars, or load from a .env using foreman/nf, dotenv, or
+whatever you prefer.
 
 Now you can use the config in other modules. For example:
 
@@ -52,8 +72,8 @@ console.log(config.get('A_NUMBER')); // 7
 console.log(config.get('WAIT_WHAT_IS_THIS')); // throws Error: Varium: Undeclared env var "WAIT_WHAT_IS_THIS"
 ```
 
-To abort builds, for example on heroku, you can run the config file postbuild.
-Just add the following to your package.json:
+If you want to abort builds when env vars are missing, you can simply run the
+config file. For example on heroku, just add the following to your package.json:
 
 ```js
 {
@@ -118,6 +138,6 @@ Returns an instance with the same api as described for `varium` above.
 ## Logs
 
 [Debug][debug] is used for logging. Thus if you need to debug something, set
-`DEBUG=varium:*`. Notice, however, that it's not adviced to use this level in
+`DEBUG=varium:*`. Notice, however, that it's not advised to use this level in
 production. It logs env var values and may thus potentially log secrets, which
 is generally frowned upon.
