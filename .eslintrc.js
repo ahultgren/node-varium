@@ -4,7 +4,7 @@ module.exports = {
         "import"
     ],
     "rules": {
-      "quotes": 0,
+      "quotes": [1, "double"],
       "no-nested-ternary": 0,
       "no-confusing-arrow": 0,
       "padded-blocks": 0,
