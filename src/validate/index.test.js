@@ -1,4 +1,4 @@
-/* global before, it, describe */
+/* global it, describe */
 
 const validator = require(".");
 const chai = require("chai");
@@ -17,7 +17,18 @@ describe("Validate", () => {
 
     it("should return error if type doesn't exist", () => {
       validator(null, [{ name: "TEST", type: "Test" }], {})
-        .should.deep.equal([{ error$: "The type Test for env var \"TEST\" does not exist." }]);
+        .should.deep.equal([{ error$: "The type Test for env var \"TEST\" does not exist.\nUnable to offer any suggestions." }]);
+    });
+
+    it("should return suggestions if type is close to a known type", () => {
+      validator(null, [{ name: "TEST", type: "int" }], {})
+        .should.deep.equal([{ error$: "The type int for env var \"TEST\" does not exist.\nMaybe you meant Int?" }]);
+
+      validator(null, [{ name: "TEST", type: "bint" }], {})
+        .should.deep.equal([{ error$: "The type bint for env var \"TEST\" does not exist.\nMaybe you meant Int?" }]);
+
+      validator(null, [{ name: "TEST", type: "sloat" }], {})
+        .should.deep.equal([{ error$: "The type sloat for env var \"TEST\" does not exist.\nMaybe you meant Float?" }]);
     });
 
     it("should return as many results as definitions", () => {
@@ -34,7 +45,7 @@ describe("Validate", () => {
 
     it("should return error if type doesn't exist", () => {
       validator(null, [{ name: "TEST", type: "Test" }], {})
-        .should.deep.equal([{ error$: "The type Test for env var \"TEST\" does not exist." }]);
+        .should.deep.equal([{ error$: "The type Test for env var \"TEST\" does not exist.\nUnable to offer any suggestions." }]);
     });
 
     it("should return as many results as definitions", () => {

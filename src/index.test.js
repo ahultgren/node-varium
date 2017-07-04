@@ -1,4 +1,4 @@
-/* global before, it, describe */
+/* global it, describe */
 
 const chai = require("chai");
 const varium = require(".");
