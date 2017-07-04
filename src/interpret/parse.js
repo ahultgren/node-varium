@@ -28,7 +28,7 @@ module.exports = R.pipe(
       const stack = duplicated.map(definition =>
         `  Env var ${definition.name} is declared more than once.`
       ).join("\n");
-      const err = new Error(`Varium: Error reading manifest`);
+      const err = new Error("Varium: Error reading manifest");
       err.stack = stack;
       throw err;
     } else {

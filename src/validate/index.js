@@ -124,7 +124,7 @@ const suggestValidatorName = (validators, typeName) => {
     }))
     .filter(validator => validator.distance < 3);
 
-  return R.sortBy(R.prop('distance'), possibleMatches)
+  return R.sortBy(R.prop("distance"), possibleMatches)
     .map(validator => validator.type);
 };
 
@@ -137,11 +137,11 @@ module.exports = (customValidators, manifest, env) => {
 
       let errorMessage = "";
 
-      if (suggestions.length === 0) errorMessage = `Unable to offer any suggestions.`;
+      if (suggestions.length === 0) errorMessage = "Unable to offer any suggestions.";
       else if (suggestions.length === 1 || suggestions[0].distance === 0) {
         errorMessage = `Maybe you meant ${suggestions[0]}?`;
       }
-      else { errorMessage = `Maybe you meant one of these: ${suggestions.join('|')}`; }
+      else { errorMessage = `Maybe you meant one of these: ${suggestions.join("|")}`; }
 
       return {
         error$: `The type ${definition.type} for env var "${definition.name}" does not exist.\n${errorMessage}`,

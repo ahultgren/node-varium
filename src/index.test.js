@@ -87,11 +87,11 @@ STRING_DEFAULT : String | def
   });
 
   it("should hadle EOF", () => {
-    reader({}, { STRING: "" }, `STRING:String`);
-    reader({}, {}, `STRING:String|`);
-    reader({}, {}, `STRING:String|asd`);
-    reader({}, {}, `STRING:String|asd#`);
-    reader({}, {}, `STRING:String|asd#asd`);
+    reader({}, { STRING: "" }, "STRING:String");
+    reader({}, {}, "STRING:String|");
+    reader({}, {}, "STRING:String|asd");
+    reader({}, {}, "STRING:String|asd#");
+    reader({}, {}, "STRING:String|asd#asd");
   });
 
   it("should handle complex default values", () => {
