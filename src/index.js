@@ -5,7 +5,7 @@ const interpret = require("./interpret");
 const validate = require("./validate");
 
 const reader = R.curry((config, env, manifestString) => {
-  const result = validate(config.validators, interpret(manifestString), env);
+  const result = validate(config.types, interpret(manifestString), env);
   const errors = result.filter(R.has("error$")).map(R.prop("error$"));
 
   if (errors.length) {
@@ -36,22 +36,22 @@ const reader = R.curry((config, env, manifestString) => {
   };
 });
 
-const loader = R.curry((read, manifestPath) => {
-  const absPath = path.resolve(process.cwd(), manifestPath);
-  let manifest;
+const loader = (manifestPath) => {
+  const appDir = path.dirname(require.main.filename);
+  const absPath = path.resolve(appDir, manifestPath);
 
   try {
-    manifest = fs.readFileSync(absPath, { encoding: "utf8" });
+    return fs.readFileSync(absPath, { encoding: "utf8" });
   } catch (e) {
-    throw new Error(`Varium: Could not find env var manifest at ${absPath}`);
+    throw new Error(`Varium: Could not find a manifest at ${absPath}`);
   }
+};
 
-  return read(manifest);
-});
+module.exports = ({
+  types = {},
+  env = process.env,
+  manifestPath = "env.manifest",
+  noProcessExit = false,
+}) => reader({ types, noProcessExit }, env, loader(manifestPath));
 
-const Varium = R.curry((validators, env, manifestPath) =>
-  loader(reader(validators, env), manifestPath));
-
-module.exports = Varium({});
-module.exports.Varium = Varium;
 module.exports.reader = reader;

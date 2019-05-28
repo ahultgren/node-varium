@@ -1,143 +1,87 @@
 # Varium
 
-Declare and validate environment variables.
+Varium is:
 
-Let's say you join a project and need to set up environment variables. You find
-a file called `env.manifest`. It contains the following:
+* a syntax which lets you declare all used environment variables in a manifest,
+* a library that validates the existence and format of these variables,
+* and a library which casts these values to their proper types.
 
-```
-REQUIRED_URL : String
-A_NUMBER : Int | 7
-FLAG : Bool | false # Comment, can be used as documentation
-LIST_OF_THINGS : Json | []
-OPTIONAL_WITH_UNDEFINED_DEFAULT : String |
-```
-
-You immediately see what env vars you need, and what they do.
-
-
-## TOC
-
-* [Philosophy](#philosophy)
-* [Installation](#installation)
-* [Usage](#usage)
-* [Documentation](#documentation)
-  * [Manifest syntax](#manifest-syntax)
-  * [API](#api)
-  * [Logs](#logs)
-
-
-## Philosophy
-
-The fundamental principles are that you want to:
-
-1. have _one_ place where _all_ environment variables are declared and documented
-2. _abort_ CI and/or builds if any environment variable is missing
-3. prevent developers (yourself) from ever using an undeclared env var
-4. treat e.g. `SOME_FLAG=false` as a boolean.
-
-In short you will never again have to hunt around in the source code for any
-environment variables you might be missing.
-
+If you've ever typed `CMD+SHIFT+F process.env` looking for which environment
+variables you need to get your local instance up and running, this library is
+for you.
 
 ## Installation
 
-`npm install varium -S`
+`npm install varium --save`
 
 _Requires node v6.5 or above._
 
+## Usage example
 
-## Usage
+Create a file called `env.manifest` in the project root. It should contain all
+environment variables used in the project. For example:
 
-The central piece of your environment configuration is the manifest. I suggest
-you create a file named `env.manifest`, see the example above.
+```
+API_BASE_URL : String
+API_SECRET : String
+NUMBER_OF_ITEMS : Int | # Optional variable
+ENABLE_DEBUG : Bool | False # Enable to print all the things. False if unset
+```
 
-Next, create a central file for your config, probably `config/index.js`, where
-you need the following:
+Then create the file which all your other files imports to obtain the config.
+For example `config/index.js`. This needs to at least contain:
 
 ```js
 const varium = require('varium');
-module.exports = varium(process.env, 'env.manifest');
+
+module.exports = varium();
 ```
 
-Of course you also need to actually define the environment variables, either
-as actual env vars, or load from a .env using foreman/nf, dotenv, or
-whatever you prefer.
-
-Now you can use the config in other modules. For example:
+Import this file in the rest of your project to read environment variables:
 
 ```js
-const config = require('./config');
-console.log(config.get('A_NUMBER')); // 7
-console.log(config.get('WAIT_WHAT_IS_THIS')); // throws Error: Varium: Undeclared env var "WAIT_WHAT_IS_THIS"
+const config = require('../config');
+const url = config.get('API_BASE_URL');
+
+// An error will be thrown if you try to load an undeclared variable:
+const wrong = config.get('AIP_ABSE_ULR');
+// -> Error('Varium: Undeclared env var "AIP_ABSE_ULR"')
 ```
 
-If you want to abort builds when env vars are missing, you can simply run the
-config file. For example on heroku, just add the following to your package.json:
+Your environment now needs to contain the required variables. If you use a
+library to load `.env`-files, the `.env` could contain this:
+
+```bash
+API_BASE_URL=https://example.com/
+API_SECRET=1337
+NUMBER_OF_ITEMS=3
+```
+
+To abort builds during CI when environment variables are missing, just include
+the config file. For example, on heroku the following would be enough:
 
 ```js
 {
   "scripts": {
-    "heroku-postbuild": "node config"
+    "heroku-postbuild": "node ./config"
   }
 }
 ```
 
+_Note:_ this library does not load environment variables from .env or similar.
+For that, use an env loader such as node-foreman.
 
-# Documentation
+For the complete api and syntax (and how to integrate e.g. dot-env), see the
+[docs](./DOCS.md).
 
-## Manifest syntax
+## Motivation
 
-`Varname : Type[ |[ Default]]`
+The fundamental idea is that you want to:
 
-* **Varname**: Name of an environment variable.
-* **Type**: The type of the variable. Can be one of `Int, Float, String, Bool, Json`
-* **Default** (optional): The default value. Must be the same type as **Type**.
-  If neither `|` nor a default value is set, the variable will be required. If
-  only `|` is set, the default will be `undefined` (thus the variable is optional).
-
-For examples see Usage above.
-
-
-## API
-
-### varium : Env -> PathToManifest -> config
-
-* **Env**: Object String, an object with a key for each environment variable and
-  the values are strings.
-* ** PathToManifest**: String, path to the manifest. Relative to `process.cwd()`
-  or absolute (e.g. `path.join(__dirname, 'env.manifest')`).
-  
-**Returns** an instance of Config.
-
-### config.get : VarName -> value
-
-Takes the name of an environment variable and returns its value. Will throw if
-the environment variable is not defined.
-
-* **VarName**: The name of the variable.
-
-**Returns** the value.
-
-[debug]: https://www.npmjs.com/package/debug
-
-### varium.Varium : Config -> varium
-
-* **Config.customValidators** : Use your own validators for custom types, or
-  overwrite the built-in ones. For example:
-  
-  ```js
-  Varium({
-    FortyTwo : (value, def) => value === "42" ? 42 : def
-  }, process.env, "env.manifest");
-  ```
-
-Returns an instance with the same api as described for `varium` above.
-
-
-## Logs
-
-[Debug][debug] is used for logging. Thus if you need to debug something, set
-`DEBUG=varium:*`. Notice, however, that it's not advised to use this level in
-production. It logs env var values and may thus potentially log secrets, which
-is generally frowned upon.
+1. have _one_ place where _all_ environment variables are declared and
+  documented, to not hunt arount the code base when setting up or deploying your
+  app,
+2. _abort_ CI and/or builds if any environment variable is missing,
+3. prevent developers (yourself) from ever using an undeclared env var,
+4. load other types than strings. E.g. treay `SOME_FLAG=false` as a boolean and
+  avoid `"41" + 1 = 411` errors.
