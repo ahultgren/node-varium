@@ -1,8 +1,7 @@
 # Varium
 
 Varium is both a syntax which lets you declare which environment variables you
-use in a manifest, and a library that validates the existence and types of these
-variables.
+use in a manifest, and a library that validates and typecasts them, too.
 
 If you've ever typed `CMD+SHIFT+F process.env` looking for which environment
 variables you need to get your local instance up and running, this library is
