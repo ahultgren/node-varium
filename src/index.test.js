@@ -1,22 +1,26 @@
 /* global it, describe */
 
+const path = require("path");
 const chai = require("chai");
 const varium = require(".");
 
 const expect = chai.expect;
 
-const Varium = varium.Varium;
 const reader = varium.reader;
 
 chai.should();
 
 describe("Loader", () => {
   it("should load an existing file", () => {
-    Varium({}, {}, "test/validManifest.txt");
+    varium({
+      manifestPath: path.resolve(__dirname, "../test/validManifest.txt"),
+    });
   });
 
   it("should fail to load a non-existing file", () => {
-    expect(Varium.bind(null, {}, {}, "test/validManifest-fail.txt"))
+    expect(varium.bind({
+      manifestPath: "test/validManifest-fail.txt"
+    }))
       .to.throw();
   });
 });
