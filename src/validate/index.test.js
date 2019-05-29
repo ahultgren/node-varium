@@ -32,7 +32,7 @@ describe("Validate", () => {
     });
 
     it("should return as many results as definitions", () => {
-      validator(null, [{ name: "TEST" }, { name: "TEST2" }]).length
+      validator(null, [{ name: "TEST" }, { name: "TEST2" }], {}).length
         .should.equal(2);
     });
   });

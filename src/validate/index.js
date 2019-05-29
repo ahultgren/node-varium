@@ -9,26 +9,31 @@ module.exports = (customValidators, manifest, env) => {
   const validators = Object.assign({}, Validators, customValidators);
 
   return manifest.map((definition) => {
-    if (!validators[definition.type]) {
+    const validator = validators[definition.type];
+    const envValue = env[definition.name];
+    const envDefault = definition.default;
+
+    if (!validator) {
       const errorMessage = validatorError(validators, definition.type);
 
       return {
         error$: `The type ${definition.type} for env var "${definition.name}" does not exist.\n${errorMessage}`,
       };
     }
-    if (env[definition.name] === undefined && definition.default === undefined) {
+
+    if (envValue === undefined && envDefault === undefined) {
       return {
         error$: `Env var "${definition.name}" requires a value.`,
       };
     }
 
     logName(definition.name);
-    logValue(`Value: ${env[definition.name]}`);
-    logValue(`Default: ${definition.default}`);
+    logValue(`Value: ${envValue}`);
+    logValue(`Default: ${envDefault}`);
 
     try {
       return {
-        [definition.name]: validators[definition.type](env[definition.name], definition.default),
+        [definition.name]: validator(envValue, envDefault),
       };
     } catch (e) {
       return {
