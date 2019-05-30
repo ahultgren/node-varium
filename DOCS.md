@@ -107,19 +107,18 @@ Config.get(VarName) -> value
 
 ## Custom types
 
-A custom type is a function that takes two values: the value read from the
-environment and the default value provided from the manifest, if any. Both are
-always strings.
+A custom type is a function that takes one value: the value read from the
+environment or the default value provided from the manifest, if any. It is
+always a string, and it's only an empty string if the variable is optional or if
+an empty string was provided from the environment (e.g. `BASE_URL=`).
 
 It returns a proper value according to the type, or throws an error.
 
 ```js
 varium({
   types: {
-    Url: (val, def) => {
-      const value = val || def;
-
-      if (!value) {
+    Url: (value) => {
+      if (value === "") {
         return undefined;
       }
 

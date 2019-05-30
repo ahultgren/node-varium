@@ -31,13 +31,27 @@ module.exports = (customValidators, manifest, env) => {
     logValue(`Value: ${envValue}`);
     logValue(`Default: ${envDefault}`);
 
+    if (envDefault !== undefined) {
+      try {
+        validator(envDefault);
+      } catch (e) {
+        return {
+          error$: `Default value for "${definition.name}" is invalid: ${e.message}`,
+        };
+      }
+    }
+
+    const value = envValue !== undefined
+      ? envValue
+      : envDefault;
+
     try {
       return {
-        [definition.name]: validator(envValue, envDefault),
+        [definition.name]: validator(value),
       };
     } catch (e) {
       return {
-        error$: `Env var "${definition.name}" is invalid: ${e.message}`,
+        error$: `Value for "${definition.name}" is invalid: ${e.message}`,
       };
     }
   });
