@@ -22,7 +22,8 @@
   "license": "ISC",
   "dependencies": {
     "js-yaml": "^3.13.1",
-    "ramda": "^0.26.1"
+    "ramda": "^0.26.1",
+    "debug": "^2.6.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",

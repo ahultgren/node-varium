@@ -1,5 +1,3 @@
-const R = require("ramda");
-
 const levDistance = (a, b) => {
   if (typeof a === "undefined") return 9000;
   if (typeof b === "undefined") return 9000;
@@ -38,6 +36,16 @@ const levDistance = (a, b) => {
   return matrix[b.length][a.length];
 };
 
+const sortByProp = (prop, list) => {
+  return list.slice(0).sort((a, b) => {
+    return a[prop] < b[prop]
+      ? -1
+      : a[prop] > b[prop]
+        ? 1
+        : 0;
+  });
+};
+
 const suggestValidatorName = (validators, typeName) => {
   const possibleMatches = Object.keys(validators)
     .map(validatorType => ({
@@ -46,7 +54,7 @@ const suggestValidatorName = (validators, typeName) => {
     }))
     .filter(validator => validator.distance < 3);
 
-  return R.sortBy(R.prop("distance"), possibleMatches)
+  return sortByProp("distance", possibleMatches)
     .map(validator => validator.type);
 };
 

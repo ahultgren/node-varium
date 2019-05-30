@@ -1,12 +1,11 @@
 const fs = require("fs");
 const path = require("path");
-const R = require("ramda");
 const interpret = require("./interpret");
 const validate = require("./validate");
 
-const reader = R.curry((config, env, manifestString) => {
+const reader = (config, env, manifestString) => {
   const result = validate(config.types, interpret(manifestString), env);
-  const errors = result.filter(R.has("error$")).map(R.prop("error$"));
+  const errors = result.map(x => x.error$).filter(Boolean);
 
   if (errors.length) {
     const msg = "Varium: Error reading env:";
@@ -23,7 +22,7 @@ const reader = R.curry((config, env, manifestString) => {
     }
   }
 
-  const values = R.mergeAll(result);
+  const values = Object.assign.apply(null, [{}].concat(result));
 
   return {
     get: (name) => {
@@ -34,7 +33,7 @@ const reader = R.curry((config, env, manifestString) => {
       }
     },
   };
-});
+};
 
 const loader = (manifestPath) => {
   const appDir = path.dirname(require.main.filename);
