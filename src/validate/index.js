@@ -1,9 +1,18 @@
-const debug = require("debug");
 const Validators = require("./validators");
 const validatorError = require("./validatorError");
 
-const logName = debug("varium:validate:name");
-const logValue = debug("varium:validate:value");
+let logName;
+let logValue;
+
+try {
+  // eslint-disable-next-line
+  const debug = require("debug");
+  logName = debug("varium:validate:name");
+  logValue = debug("varium:validate:value");
+} catch (e) {
+  logName = () => {};
+  logValue = () => {};
+}
 
 module.exports = (customValidators, manifest, env) => {
   const validators = Object.assign({}, Validators, customValidators);

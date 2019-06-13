@@ -22,8 +22,10 @@
   "license": "ISC",
   "dependencies": {
     "js-yaml": "^3.13.1",
-    "ramda": "^0.26.1",
-    "debug": "^2.6.1"
+    "ramda": "^0.26.1"
+  },
+  "peerDependencies": {
+    "debug": "2.x"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -31,8 +33,5 @@
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.6.1",
     "mocha": "^6.1.4"
-  },
-  "peerDependencies": {
-    "debug": "2.x"
   }
 }
