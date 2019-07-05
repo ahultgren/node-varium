@@ -1,0 +1,52 @@
+validators:
+- &validDeclarationName /[a-zA-Z0-9_]/i
+- &validDefaultValue /[^#\n]/
+
+Noop:
+  [*validDeclarationName]: DeclarationName
+  /#/: Comment
+  EOF: success
+  WS: skip
+
+DeclarationName:
+  [*validDeclarationName]: take
+  / |:/: [save, DeclarationSeparator]
+DeclarationSeparator:
+  / /: skip
+  /:/: [skip, DeclarationSeparatorEnd]
+DeclarationSeparatorEnd:
+  / /: skip
+  /[A-Z]/i: DeclarationType
+DeclarationType:
+  /[A-Z]/i: take
+  _: [save, DeclarationTypeEnd]
+DeclarationTypeEnd:
+  / /: skip
+  /\|/: [skip, DefaultOrOptional]
+  /#/: Noop
+  /\n/: Noop
+  EOF: Noop
+
+DefaultOrOptional:
+  / /: skip
+  [*validDefaultValue]: DeclarationDefaultStart
+  EOF: DeclarationDefault
+  EOL: DeclarationDefault
+  /#/: DeclarationDefault
+DeclarationDefaultStart:
+  /"/: [skip, DeclarationDefaultQuoted]
+  [*validDefaultValue]: DeclarationDefaultUnquoted
+DeclarationDefaultUnquoted:
+  [*validDefaultValue]: take
+  _: [trim, DeclarationDefault]
+DeclarationDefaultQuoted:
+  /\\/: [skip, take]
+  /"/: [skip, DeclarationDefault]
+  _: take
+DeclarationDefault:
+  _: [save, Noop]
+
+Comment:
+  EOL: Noop
+  EOF: Noop
+  _: skip
