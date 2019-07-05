@@ -21,14 +21,17 @@
   "author": "Andreas Hultgren",
   "license": "ISC",
   "dependencies": {
-    "debug": "^2.6.1",
-    "ramda": "^0.23.0"
+    "js-yaml": "^3.13.1",
+    "ramda": "^0.26.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.6.1",
-    "mocha": "^3.0.2"
+    "mocha": "^6.1.4"
+  },
+  "peerDependencies": {
+    "debug": "2.x"
   }
 }

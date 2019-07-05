@@ -89,13 +89,13 @@ describe("Lex", () => {
   });
 
   it("should fail on invalid name", () => {
-    expect(() => lex("THINGö : String")).to.throw("Unexpected ö in DeclarationName");
-    expect(() => lex("-THING : String")).to.throw("Unexpected -");
-    expect(() => lex("TH'ING : String")).to.throw("Unexpected ' in DeclarationName");
-    expect(() => lex(": String")).to.throw("Unexpected :");
+    expect(() => lex("THINGö : String")).to.throw("Unexpected 'ö' in DeclarationName");
+    expect(() => lex("-THING : String")).to.throw("Unexpected '-'");
+    expect(() => lex("TH'ING : String")).to.throw("Unexpected '''");
+    expect(() => lex(": String")).to.throw("Unexpected ':'");
   });
 
   it("should fail with only name", () => {
-    expect(() => lex("String")).to.throw("Unexpected \n in DeclarationName");
+    expect(() => lex("String")).to.throw("Unexpected 'EOF' in DeclarationName");
   });
 });
