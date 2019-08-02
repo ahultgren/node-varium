@@ -10,6 +10,7 @@ module.exports = {
       "padded-blocks": 0,
       "no-else-return": 0,
       "brace-style": 0,
-      "comma-dangle": 0
+      "comma-dangle": 0,
+      "arrow-body-style": 0
     }
 };

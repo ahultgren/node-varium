@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const R = require("ramda");
 const interpret = require("./interpret");
 const validate = require("./validate");
+const nameError = require("./util/suggest");
 
-const reader = R.curry((config, env, manifestString) => {
-  const result = validate(config.validators, interpret(manifestString), env);
-  const errors = result.filter(R.has("error$")).map(R.prop("error$"));
+const reader = (config, env, manifestString) => {
+  const result = validate(config.types, interpret(manifestString), env);
+  const errors = result.map(x => x.error$).filter(Boolean);
 
   if (errors.length) {
     const msg = "Varium: Error reading env:";
@@ -23,35 +23,42 @@ const reader = R.curry((config, env, manifestString) => {
     }
   }
 
-  const values = R.mergeAll(result);
+  const values = Object.assign.apply(null, [{}].concat(result));
 
-  return {
-    get: (name) => {
-      if (Object.prototype.hasOwnProperty.call(values, name)) {
-        return values[name];
+  return new Proxy(values, {
+    get(target, prop) {
+      if (!Object.prototype.hasOwnProperty.call(target, prop)) {
+        if (prop === "get") {
+          return (name) => {
+            throw new Error(`Varium upgrade notice: config.get("${name}") is obsolete. Access the property directly using config.${name}`);
+          };
+        } else {
+          const suggestion = nameError(Object.keys(values), prop);
+          throw new Error(`Varium: Undeclared env var '${prop}'.\n${suggestion}`);
+        }
       } else {
-        throw new Error(`Varium: Undeclared env var "${name}"`);
+        return target[prop];
       }
-    },
-  };
-});
+    }
+  });
+};
 
-const loader = R.curry((read, manifestPath) => {
-  const absPath = path.resolve(process.cwd(), manifestPath);
-  let manifest;
+const loader = (manifestPath) => {
+  const appDir = path.dirname(require.main.filename);
+  const absPath = path.resolve(appDir, manifestPath);
 
   try {
-    manifest = fs.readFileSync(absPath, { encoding: "utf8" });
+    return fs.readFileSync(absPath, { encoding: "utf8" });
   } catch (e) {
-    throw new Error(`Varium: Could not find env var manifest at ${absPath}`);
+    throw new Error(`Varium: Could not find a manifest at ${absPath}`);
   }
+};
 
-  return read(manifest);
-});
+module.exports = ({
+  types = {},
+  env = process.env,
+  manifestPath = "env.manifest",
+  noProcessExit = false,
+}) => reader({ types, noProcessExit }, env, loader(manifestPath));
 
-const Varium = R.curry((validators, env, manifestPath) =>
-  loader(reader(validators, env), manifestPath));
-
-module.exports = Varium({});
-module.exports.Varium = Varium;
 module.exports.reader = reader;
