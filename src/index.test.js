@@ -73,19 +73,25 @@ STRING_DEFAULT : String | def
       STRING_DEFAULT: "str",
     }, manifest);
 
-    noValues.get("STRING_REQUIRED").should.equal("str");
-    noValues.get("STRING_OPTIONAL").should.equal("");
-    noValues.get("STRING_DEFAULT").should.equal("def");
-    withValues.get("STRING_OPTIONAL").should.equal("str");
-    withValues.get("STRING_DEFAULT").should.equal("str");
+    noValues.STRING_REQUIRED.should.equal("str");
+    noValues.STRING_OPTIONAL.should.equal("");
+    noValues.STRING_DEFAULT.should.equal("def");
+    withValues.STRING_OPTIONAL.should.equal("str");
+    withValues.STRING_DEFAULT.should.equal("str");
   });
 
   it("should throw when accesing undeclared vars", () => {
     const config = reader({}, {}, "NAN_EXISTING : String |");
-    expect(config.get.bind(null, "NON_EXISTING"))
+    expect(() => config.NON_EXISTING)
     .to.throw("Varium: Undeclared env var 'NON_EXISTING'."
       + "\n"
       + "Maybe you meant NAN_EXISTING?");
+  });
+
+  it("should warn about obsolete usage of .get", () => {
+    const config = reader({}, {}, "");
+    expect(() => config.get("A_VAR"))
+    .to.throw("Varium upgrade notice: config.get(\"A_VAR\") is obsolete. Access the property directly using config.A_VAR");
   });
 
   it("should reject duplicate definitions", () => {
@@ -110,10 +116,10 @@ STRING_DEFAULT : String | def
       STR5 : String | or unquoted "quotes"?
     `);
 
-    config.get("STR1").should.equal("A long time ago");
-    config.get("STR2").should.equal("In a galaxy");
-    config.get("STR3").should.equal("full of # signs");
-    config.get("STR4").should.equal("and quoted \"quotes\"");
-    config.get("STR5").should.equal("or unquoted \"quotes\"?");
+    config.STR1.should.equal("A long time ago");
+    config.STR2.should.equal("In a galaxy");
+    config.STR3.should.equal("full of # signs");
+    config.STR4.should.equal("and quoted \"quotes\"");
+    config.STR5.should.equal("or unquoted \"quotes\"?");
   });
 });

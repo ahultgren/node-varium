@@ -124,9 +124,9 @@ Options.noProcessExit
     valdiation errors.
 
 
-Config.get(VarName) -> value
-    Takes the name of an environment variable and returns its value. Will throw
-    if the environment variable is not defined.
+Config
+    An object consisting of the declared environment variables. Will throw if
+    accessing an undeclared environment variable.
 
 ```
 

@@ -50,11 +50,11 @@ Import this file in the rest of your project to read environment variables:
 
 ```js
 const config = require('../config');
-const url = config.get('API_BASE_URL');
+const url = config.API_BASE_URL;
 
 // An error will be thrown if you try to load an undeclared variable:
-const wrong = config.get('AIP_ABSE_ULR');
-// -> Error('Varium: Undeclared env var "AIP_ABSE_ULR"')
+const wrong = config.API_BASE_ULR;
+// -> Error('Varium: Undeclared env var "API_BASE_ULR.\nMaybe you meant API_BASE_URL?"')
 ```
 
 To prevent other developers or your future self from using `process.env`

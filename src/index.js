@@ -25,16 +25,22 @@ const reader = (config, env, manifestString) => {
 
   const values = Object.assign.apply(null, [{}].concat(result));
 
-  return {
-    get: (name) => {
-      if (Object.prototype.hasOwnProperty.call(values, name)) {
-        return values[name];
+  return new Proxy(values, {
+    get(target, prop) {
+      if (!Object.prototype.hasOwnProperty.call(target, prop)) {
+        if (prop === "get") {
+          return (name) => {
+            throw new Error(`Varium upgrade notice: config.get("${name}") is obsolete. Access the property directly using config.${name}`);
+          };
+        } else {
+          const suggestion = nameError(Object.keys(values), prop);
+          throw new Error(`Varium: Undeclared env var '${prop}'.\n${suggestion}`);
+        }
       } else {
-        const suggestion = nameError(Object.keys(values), name);
-        throw new Error(`Varium: Undeclared env var '${name}'.\n${suggestion}`);
+        return target[prop];
       }
-    },
-  };
+    }
+  });
 };
 
 const loader = (manifestPath) => {
