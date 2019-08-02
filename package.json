@@ -1,6 +1,6 @@
 {
   "name": "varium",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Declare and validate environment variables",
   "engines": {
     "node": ">=6.5"
