@@ -81,8 +81,11 @@ STRING_DEFAULT : String | def
   });
 
   it("should throw when accesing undeclared vars", () => {
-    const config = reader({}, {}, "");
-    expect(config.get.bind(null, "NON_EXISTING")).to.throw();
+    const config = reader({}, {}, "NAN_EXISTING : String |");
+    expect(config.get.bind(null, "NON_EXISTING"))
+    .to.throw("Varium: Undeclared env var 'NON_EXISTING'."
+      + "\n"
+      + "Maybe you meant NAN_EXISTING?");
   });
 
   it("should reject duplicate definitions", () => {

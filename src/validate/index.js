@@ -1,5 +1,5 @@
 const Validators = require("./validators");
-const validatorError = require("./validatorError");
+const validatorError = require("../util/suggest");
 
 let logName;
 let logValue;
@@ -23,7 +23,7 @@ module.exports = (customValidators, manifest, env) => {
     const envDefault = definition.default;
 
     if (!validator) {
-      const errorMessage = validatorError(validators, definition.type);
+      const errorMessage = validatorError(Object.keys(validators), definition.type);
 
       return {
         error$: `The type ${definition.type} for env var "${definition.name}" does not exist.\n${errorMessage}`,

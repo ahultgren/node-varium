@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const interpret = require("./interpret");
 const validate = require("./validate");
+const nameError = require("./util/suggest");
 
 const reader = (config, env, manifestString) => {
   const result = validate(config.types, interpret(manifestString), env);
@@ -29,7 +30,8 @@ const reader = (config, env, manifestString) => {
       if (Object.prototype.hasOwnProperty.call(values, name)) {
         return values[name];
       } else {
-        throw new Error(`Varium: Undeclared env var "${name}"`);
+        const suggestion = nameError(Object.keys(values), name);
+        throw new Error(`Varium: Undeclared env var '${name}'.\n${suggestion}`);
       }
     },
   };

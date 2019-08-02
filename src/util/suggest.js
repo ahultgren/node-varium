@@ -46,21 +46,21 @@ const sortByProp = (prop, list) => {
   });
 };
 
-const suggestValidatorName = (validators, typeName) => {
-  const possibleMatches = Object.keys(validators)
-    .map(validatorType => ({
-      type: validatorType,
-      distance: levDistance(validatorType, typeName)
+const suggestName = (alternatives, search) => {
+  const possibleMatches = alternatives
+    .map(name => ({
+      name,
+      distance: levDistance(name, search)
     }))
-    .filter(validator => validator.distance < 3);
+    .filter(alternative => alternative.distance < 3);
 
   return sortByProp("distance", possibleMatches)
-    .map(validator => validator.type);
+    .map(alternative => alternative.name);
 };
 
 
-module.exports = (validators, type) => {
-  const suggestions = suggestValidatorName(validators, type);
+module.exports = (alternatives, search) => {
+  const suggestions = suggestName(alternatives, search);
 
   if (suggestions.length === 0) {
     return "Unable to offer any suggestions.";
