@@ -36,5 +36,6 @@
   },
   "files": [
     "/src"
-  ]
+  ],
+  "repository": "ahultgren/node-varium"
 }
