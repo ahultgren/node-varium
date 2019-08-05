@@ -59,6 +59,6 @@ module.exports = ({
   env = process.env,
   manifestPath = "env.manifest",
   noProcessExit = false,
-}) => reader({ types, noProcessExit }, env, loader(manifestPath));
+} = {}) => reader({ types, noProcessExit }, env, loader(manifestPath));
 
 module.exports.reader = reader;
