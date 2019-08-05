@@ -102,7 +102,7 @@ module.exports = (rawSyntax, initialState, chars) => {
     EOF: "/EOF/",
     WS: "/ |\\t|\\n/",
     EOL: "/\\n/",
-    _: "/.*/s",
+    _: "/(.|\\r\\n|\\r|\\n)*/",
   };
 
   const doAction = (action) => {
