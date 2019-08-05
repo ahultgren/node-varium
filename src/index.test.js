@@ -83,7 +83,7 @@ STRING_DEFAULT : String | def
   it("should throw when accesing undeclared vars", () => {
     const config = reader({}, {}, "NAN_EXISTING : String |");
     expect(() => config.NON_EXISTING)
-    .to.throw("Varium: Undeclared env var 'NON_EXISTING'."
+      .to.throw("Varium: Undeclared env var 'NON_EXISTING'."
       + "\n"
       + "Maybe you meant NAN_EXISTING?");
   });
@@ -91,7 +91,7 @@ STRING_DEFAULT : String | def
   it("should warn about obsolete usage of .get", () => {
     const config = reader({}, {}, "");
     expect(() => config.get("A_VAR"))
-    .to.throw("Varium upgrade notice: config.get(\"A_VAR\") is obsolete. Access the property directly using config.A_VAR");
+      .to.throw("Varium upgrade notice: config.get(\"A_VAR\") is obsolete. Access the property directly using config.A_VAR");
   });
 
   it("should reject duplicate definitions", () => {

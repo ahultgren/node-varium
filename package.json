@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "eslint": "^3.19.0",
+    "eslint": "^6.1.0",
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.6.1",
     "mocha": "^6.1.4"
