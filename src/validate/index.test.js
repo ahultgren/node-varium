@@ -75,7 +75,7 @@ describe("Validate", () => {
       name: "TEST",
       type,
       default: def,
-    }], value ? {
+    }], value !== undefined ? {
       TEST: value,
     } : {})[0];
 
@@ -219,7 +219,7 @@ describe("Validate", () => {
       });
 
       it("should return default if no value is provided", () => {
-        Json("", "{\"asd\":1}", "").TEST.should.deep.equal({ asd: 1 });
+        Json("", "{\"asd\":1}").TEST.should.deep.equal({ asd: 1 });
         Json(undefined, "\"asd\"").TEST.should.equal("asd");
         expect(Json("", "null").TEST).to.equal(null);
       });

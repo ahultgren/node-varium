@@ -50,9 +50,9 @@ module.exports = (customValidators, manifest, env) => {
       }
     }
 
-    const value = envValue !== undefined
-      ? envValue
-      : envDefault;
+    const value = envValue === undefined || envValue === ""
+      ? envDefault
+      : envValue;
 
     try {
       return {
