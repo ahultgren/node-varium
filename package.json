@@ -25,7 +25,7 @@
     "ramda": "^0.26.1"
   },
   "peerDependencies": {
-    "debug": "2.x"
+    "debug": "^2.6.9"
   },
   "devDependencies": {
     "chai": "^3.5.0",
