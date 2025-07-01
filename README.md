@@ -3,14 +3,16 @@
 Varium is a library and syntax for managing environment variables in a sane way.
 You should use it if you want to:
 
-* **declare** all used environment variables in **one place**
-* **specify** which **types** they have
-* **validate** that they are of the right type
-* **cast environment variables** to the right type when used
-* **require** certain variables
-* **default** to a value for other variables
-* **abort CI** if variables are missing or fail validation
-* **warn developers** if they use an undeclared environment variable
+- **declare** all used environment variables in **one place**
+- **specify** which **types** they have
+- **validate** that they are of the right type
+- **cast environment variables** to the right type when used
+- **require** certain variables
+- **default** to a value for other variables
+- **abort CI** if variables are missing or fail validation
+- **warn developers** if they use an undeclared environment variable
+
+_**Note**: Version 3 only supports Bun and other typescript-native environments, as no js-files or .d.ts files are generated. Feel free to PR if you need this, or use v2.0.6._
 
 ## Installation
 
@@ -41,7 +43,7 @@ Then create the file which all your other files imports to obtain the config.
 For example `config/index.js`. This needs to at least contain:
 
 ```js
-const varium = require('varium');
+const varium = require("varium");
 
 module.exports = varium();
 ```
@@ -49,7 +51,7 @@ module.exports = varium();
 Import this file in the rest of your project to read environment variables:
 
 ```js
-const config = require('../config');
+const config = require("../config");
 const url = config.API_BASE_URL;
 
 // An error will be thrown if you try to load an undeclared variable:
