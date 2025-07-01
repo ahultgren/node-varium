@@ -1,4 +1,4 @@
-const levDistance = (a, b) => {
+const levDistance = (a: string, b: string): number => {
   if (typeof a === "undefined") return 9000;
   if (typeof b === "undefined") return 9000;
   if (a.length === 0) return b.length;
@@ -6,16 +6,16 @@ const levDistance = (a, b) => {
 
   if (a.toLowerCase() === b.toLowerCase()) return 0;
 
-  const matrix = [];
+  const matrix: number[][] = [];
 
   // increment along the first column of each row
-  let i;
+  let i: number;
   for (i = 0; i <= b.length; i += 1) {
     matrix[i] = [i];
   }
 
   // increment each column in the first row
-  let j;
+  let j: number;
   for (j = 0; j <= a.length; j += 1) {
     matrix[0][j] = j;
   }
@@ -26,9 +26,13 @@ const levDistance = (a, b) => {
       if (b.charAt(i - 1) === a.charAt(j - 1)) {
         matrix[i][j] = matrix[i - 1][j - 1];
       } else {
-        matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, // substitution
-          Math.min(matrix[i][j - 1] + 1, // insertion
-            matrix[i - 1][j] + 1)); // deletion
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          Math.min(
+            matrix[i][j - 1] + 1, // insertion
+            matrix[i - 1][j] + 1
+          )
+        ); // deletion
       }
     }
   }
@@ -36,35 +40,31 @@ const levDistance = (a, b) => {
   return matrix[b.length][a.length];
 };
 
-const sortByProp = (prop, list) => {
+const sortByProp = (prop: string, list: any[]): any[] => {
   return list.slice(0).sort((a, b) => {
-    return a[prop] < b[prop]
-      ? -1
-      : a[prop] > b[prop]
-        ? 1
-        : 0;
+    return a[prop] < b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0;
   });
 };
 
-const suggestName = (alternatives, search) => {
+const suggestName = (alternatives: string[], search: string): string[] => {
   const possibleMatches = alternatives
-    .map(name => ({
+    .map((name) => ({
       name,
-      distance: levDistance(name, search)
+      distance: levDistance(name, search),
     }))
-    .filter(alternative => alternative.distance < 3);
+    .filter((alternative) => alternative.distance < 3);
 
-  return sortByProp("distance", possibleMatches)
-    .map(alternative => alternative.name);
+  return sortByProp("distance", possibleMatches).map(
+    (alternative) => alternative.name
+  );
 };
 
-
-module.exports = (alternatives, search) => {
+export default (alternatives: string[], search: string): string => {
   const suggestions = suggestName(alternatives, search);
 
   if (suggestions.length === 0) {
     return "Unable to offer any suggestions.";
-  } else if (suggestions.length === 1 || suggestions[0].distance === 0) {
+  } else if (suggestions.length === 1) {
     return `Maybe you meant ${suggestions[0]}?`;
   } else {
     return `Maybe you meant one of these: ${suggestions.join("|")}`;

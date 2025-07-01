@@ -1,13 +1,14 @@
 {
   "name": "varium",
   "version": "2.0.6",
+  "type": "module",
   "description": "Declare and validate environment variables",
   "engines": {
     "node": ">=6.5"
   },
-  "main": "src",
+  "main": "src/index.ts",
   "scripts": {
-    "test": "eslint --fix . && mocha --recursive './{,!(node_modules)/**/}*.test.js'"
+    "test": "mocha --recursive './{,!(node_modules)/**/}*.test.ts'"
   },
   "keywords": [
     "env",
@@ -28,11 +29,17 @@
     "debug": "2.x"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/js-yaml": "^4.0.9",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.0.7",
+    "@types/ramda": "^0.30.2",
     "chai": "^3.5.0",
     "eslint": "^6.1.0",
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.6.1",
-    "mocha": "^6.1.4"
+    "mocha": "^6.1.4",
+    "typescript": "^5.8.3"
   },
   "files": [
     "/src"

@@ -1,12 +1,14 @@
-const Validators = require("./validators");
-const validatorError = require("../util/suggest");
+import defaultValidators from "./validators";
+import validatorError from "../util/suggest";
+import { Env, ValidationError, Validators } from "./types";
+import { Definition } from "../interpret/types";
 
 let logName;
 let logValue;
 
 try {
   // eslint-disable-next-line
-  const debug = require("debug");
+  const debug = await import("debug");
   logName = debug("varium:validate:name");
   logValue = debug("varium:validate:value");
 } catch (e) {
@@ -14,16 +16,23 @@ try {
   logValue = () => {};
 }
 
-module.exports = (customValidators, manifest, env) => {
-  const validators = Object.assign({}, Validators, customValidators);
+export default function validate(
+  customValidators: Validators | undefined | null,
+  manifest: Definition[],
+  env: NodeJS.ProcessEnv
+): (ValidationError | Env)[] {
+  const validators = Object.assign({}, defaultValidators, customValidators);
 
   return manifest.map((definition) => {
-    const validator = validators[definition.type];
+    const validator = validators[definition.type!];
     const envValue = env[definition.name];
     const envDefault = definition.default;
 
     if (!validator) {
-      const errorMessage = validatorError(Object.keys(validators), definition.type);
+      const errorMessage = validatorError(
+        Object.keys(validators),
+        definition.type!
+      );
 
       return {
         error$: `The type ${definition.type} for env var "${definition.name}" does not exist.\n${errorMessage}`,
@@ -50,9 +59,8 @@ module.exports = (customValidators, manifest, env) => {
       }
     }
 
-    const value = envValue === undefined || envValue === ""
-      ? envDefault
-      : envValue;
+    const value =
+      envValue === undefined || envValue === "" ? envDefault : envValue;
 
     try {
       return {
@@ -64,6 +72,6 @@ module.exports = (customValidators, manifest, env) => {
       };
     }
   });
-};
+}
 
-module.exports.validators = Validators;
+export { defaultValidators };

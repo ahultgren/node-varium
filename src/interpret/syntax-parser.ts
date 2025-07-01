@@ -1,26 +1,28 @@
-const R = require("ramda");
+import R from "ramda";
+import { State, Patterns, Syntax, Token, Action } from "./types";
 
-let log;
+let log: (...args: any[]) => void;
 
 try {
   // eslint-disable-next-line
-  const debug = require("debug");
+  const debug = await import("debug");
   log = debug("varium:lexer");
 } catch (e) {
   log = () => {};
 }
 
-const wrapNonArrays = R.ifElse(
-  Array.isArray,
-  R.identity,
-  R.of);
+// Hack: convince typescript that R.map maps over objects
+const mapObj = R.map as <T, U>(
+  fn: (x: T) => U
+) => (obj: Record<string, T>) => Record<string, U>;
 
-const harmonizeSyntax = R.map(R.map(wrapNonArrays));
+const wrapNonArrays = R.ifElse(Array.isArray, R.identity, (x) => [x]);
+const harmonizeSyntax = mapObj(mapObj(wrapNonArrays));
 
-const Input = (data) => {
+const Input = (data: string) => {
   let i = 0;
   return {
-    peek: () => data[i] === undefined ? "EOF" : data[i],
+    peek: () => (data[i] === undefined ? "EOF" : data[i]),
     skip: () => {
       i += 1;
     },
@@ -29,26 +31,27 @@ const Input = (data) => {
   };
 };
 
-const matchCondition = (patterns, char) => (condition) => {
-  const pattern = patterns[condition] || condition;
+const matchCondition =
+  (patterns: Patterns, char: string) => (condition: string) => {
+    const pattern = patterns[condition] || condition;
 
-  if (!pattern) {
-    throw new Error(`Unknown condition ${condition}`);
-  }
+    if (!pattern) {
+      throw new Error(`Unknown condition ${condition}`);
+    }
 
-  const parts = pattern.match(/^\/(.*)\/([a-z]*)/);
+    const parts = pattern.match(/^\/(.*)\/([a-z]*)/);
 
-  if (!parts) {
-    throw new Error(`Invalid condition ${condition}`);
-  }
+    if (!parts) {
+      throw new Error(`Invalid condition ${condition}`);
+    }
 
-  const safeRegexStr = parts[1][0] === "^" ? parts[1] : `^(${parts[1]})$`;
-  const regex = new RegExp(safeRegexStr, parts[2]);
+    const safeRegexStr = parts[1][0] === "^" ? parts[1] : `^(${parts[1]})$`;
+    const regex = new RegExp(safeRegexStr, parts[2]);
 
-  return String(char).match(regex);
-};
+    return Boolean(String(char).match(regex));
+  };
 
-const FailSafe = (lim) => {
+const FailSafe = (lim: number) => {
   const limit = Math.max(10, lim);
   let lastPos = -1;
   let count = 0;
@@ -65,17 +68,17 @@ const FailSafe = (lim) => {
   };
 };
 
-module.exports = (rawSyntax, initialState, chars) => {
-  const tokens = [];
+export default (rawSyntax: Syntax, initialState: State, chars: string) => {
+  const tokens: Token[] = [];
   const syntax = harmonizeSyntax(rawSyntax);
   const input = Input(chars);
   const failSafe = FailSafe(chars.length);
 
   let done = false;
-  let currentStateName = initialState;
+  let currentStateName: State = initialState;
   let store = "";
 
-  const functions = {
+  const functions: Record<Action, () => void> = {
     take() {
       store += input.peek();
       input.skip();
@@ -98,18 +101,18 @@ module.exports = (rawSyntax, initialState, chars) => {
     },
   };
 
-  const patterns = {
+  const patterns: Patterns = {
     EOF: "/EOF/",
     WS: "/ |\\t|\\n/",
     EOL: "/\\n/",
     _: "/(.|\\r\\n|\\r|\\n)*/",
   };
 
-  const doAction = (action) => {
+  const doAction = (action: State | Action) => {
     if (functions[action]) {
       functions[action]();
     } else if (syntax[action]) {
-      currentStateName = action;
+      currentStateName = action as State;
     } else {
       throw new Error(`Unknown action ${action}`);
     }
@@ -119,7 +122,10 @@ module.exports = (rawSyntax, initialState, chars) => {
     const currentChar = input.peek();
     const currentState = syntax[currentStateName];
 
-    const condition = R.find(matchCondition(patterns, currentChar), Object.keys(currentState));
+    const condition = R.find(
+      matchCondition(patterns, currentChar),
+      Object.keys(currentState)
+    ) as string;
     const actions = currentState[condition];
 
     log(currentStateName, currentChar, actions);
@@ -131,7 +137,9 @@ module.exports = (rawSyntax, initialState, chars) => {
     }
 
     if (!failSafe(input.pos())) {
-      throw new Error(`Endless cycle detected in state ${currentStateName} for condition ${condition}: ${actions}`);
+      throw new Error(
+        `Endless cycle detected in state ${currentStateName} for condition ${condition}: ${actions}`
+      );
     }
 
     if (input.eof()) {
