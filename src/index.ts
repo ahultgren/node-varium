@@ -59,8 +59,8 @@ function reader(
   });
 }
 
-const loader = (manifestPath) => {
-  const appDir = path.dirname(require?.main?.filename ?? process.cwd());
+const loader = (manifestPath: string) => {
+  const appDir = path.dirname(require?.main?.filename ?? process.cwd() + "/_");
   const absPath = path.resolve(appDir, manifestPath);
 
   try {
